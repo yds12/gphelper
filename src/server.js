@@ -20,7 +20,7 @@ function start(configurations){
 function setupRoutes(){
   app.get('/', (req, res) => {
 //    res.sendFile(path.join(__dirname, '..', config.publicDir, 'index.html'));
-    htmlBuilder.template('index', 'http://www.afp.com/pt')
+    htmlBuilder.template('index', 'https://www.afp.com/pt')
       .then(result => {
         console.log('HTML successfully built. Result size:', result.length);
         res.send(result);
