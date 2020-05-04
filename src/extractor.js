@@ -4,7 +4,10 @@ const fetcher = require('./fetcher');
 
 const providers = [
   require('./provider/afp'),
-  require('./provider/reuters')
+  require('./provider/reuters'),
+  require('./provider/uol'),
+  require('./provider/g1'),
+  require('./provider/dw'),
 ];
 
 async function extract(){
