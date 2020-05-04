@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const fetcher = require('./fetcher');
 
 // Server setup
 const app = express();
@@ -17,16 +18,20 @@ function start(configurations){
 }
 
 function setupRoutes(){
-  app.use(express.static(config.publicDir));
-
   app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', config.publicDir, 'index.html'));
+//    res.sendFile(path.join(__dirname, '..', config.publicDir, 'index.html'));
+    fetcher.fetch('http://www.afp.com/pt')
+      .then(result => {
+        console.log('Fetch successful. Result size:', result.length);
+        res.send(result);
+      })
+      .catch(err => {
+        console.log('Fetch failed.');
+        res.status(500).send('500 Server Error.');
+      });
   });
 
-  app.get('/js/config.js', (req, res) => {
-    res.set('Content-Type', 'application/javascript');
-    res.send(`const PORT = ${config.port};`);
-  });
+  app.use(express.static(config.publicDir));
 
   app.get('*', (req, res) => {
     console.log('Requested URL: ', req.url);
