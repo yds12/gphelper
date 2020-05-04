@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const fetcher = require('./fetcher');
+const htmlBuilder = require('./html-builder');
 
 // Server setup
 const app = express();
@@ -20,13 +20,13 @@ function start(configurations){
 function setupRoutes(){
   app.get('/', (req, res) => {
 //    res.sendFile(path.join(__dirname, '..', config.publicDir, 'index.html'));
-    fetcher.fetch('http://www.afp.com/pt')
+    htmlBuilder.template('index', 'http://www.afp.com/pt')
       .then(result => {
-        console.log('Fetch successful. Result size:', result.length);
+        console.log('HTML successfully built. Result size:', result.length);
         res.send(result);
       })
       .catch(err => {
-        console.log('Fetch failed.');
+        console.log('Failed to build response:', err.message);
         res.status(500).send('500 Server Error.');
       });
   });
