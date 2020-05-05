@@ -5,7 +5,6 @@ const extractor = require('./extractor');
 
 async function buildTemplate(template, url){
   let data = await extractor.extract(url);
-//  let data = [{title: 'noticia 1'}, {title: 'noticia 2'}];
 
   if(template === 'index'){
     let fileContent = await getFile(`html-template/${template}.html`);

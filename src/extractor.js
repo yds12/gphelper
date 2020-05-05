@@ -10,6 +10,16 @@ const providers = [
   require('./provider/dw'),
 ];
 
+// should be in a separate helper
+function shuffle(array){
+  for(let i = array.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
 async function extract(){
   elements = [];
 
@@ -25,6 +35,7 @@ async function extract(){
         parsedUrl.hostname.toLowerCase().replace('www.', '')));
   }
 
+  shuffle(elements);
   return elements;
 }
 
