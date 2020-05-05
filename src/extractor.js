@@ -2,34 +2,40 @@ const url_module = require('url');
 const cheerio = require('cheerio');
 const fetcher = require('./fetcher');
 
-const URLs = [''];
+const providers = [
+  require('./provider/afp'),
+  require('./provider/reuters'),
+  require('./provider/uol'),
+  require('./provider/g1'),
+  require('./provider/dw'),
+];
 
-async function extract(url){
-  let source = await fetcher.fetch(url);
-  let idx = source.toLowerCase().indexOf('últimos textos');
-
-  if(idx > -1){
-    source = source.substr(idx);
+// should be in a separate helper
+function shuffle(array){
+  for(let i = array.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
   }
+}
 
-  idx = source.toLowerCase().indexOf('esporte');
-  if(idx > -1){
-    source = source.substr(0, idx);
-  }
-
-  let ch = cheerio.load(source);
-
-  let parsedUrl = url_module.parse(url);
-  let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
+async function extract(){
   elements = [];
 
-  ch('h3 a').each((i,e) => {
-    elements[i] = { 
-      title: ch(e).text(),
-      link: partialUrl + ch(e).attr('href'),
-      source: parsedUrl.hostname.toLowerCase().replace('www.', '')
-    };
-  });
+  for(let provider of providers){
+    let source = await fetcher.fetch(provider.url);
+    source = provider.cutHtml(source);
+    let ch = cheerio.load(source);
+    let parsedUrl = url_module.parse(provider.url);
+    let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
+
+    elements = elements.concat(
+      provider.assembleItems(ch, partialUrl,
+        parsedUrl.hostname.toLowerCase().replace('www.', '')));
+  }
+
+  shuffle(elements);
   return elements;
 }
 
