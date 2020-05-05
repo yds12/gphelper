@@ -5,6 +5,8 @@ const fs = require('fs');
 const readline = require('readline');
 const htmlBuilder = require('./html-builder');
 
+const keywordsFile = 'keywords.txt';
+
 // Server setup
 const app = express();
 app.disable('x-powered-by');
@@ -16,10 +18,31 @@ function start(configurations){
   config = configurations;
   server.listen(config.port, () =>
     console.log(`Express server listening on port ${config.port}...`));
-  setupRoutes();
+  buildConfigFile((clientConfigFile) => {
+    setupRoutes(clientConfigFile);
+  });
 }
 
-function setupRoutes(){
+function buildConfigFile(callback){
+  const rl = readline.createInterface({
+    input: fs.createReadStream(keywordsFile),
+    crlfDelay: Infinity
+  });
+
+  let configFileContent = 'const CONFIG = {};';
+  configFileContent += 'CONFIG.keywords = [';
+
+  rl.on('line', line => {
+    configFileContent += `"${line}",`;
+  });
+
+  rl.on('close', () => {
+    configFileContent += '];'
+    callback(configFileContent);
+  });
+}
+
+function setupRoutes(clientConfigFile){
   app.use(express.static(config.publicDir));
 
   app.get('/', (req, res) => {
@@ -35,22 +58,8 @@ function setupRoutes(){
   });
 
   app.get('/js/config.js', (req, res) => {
-    const rl = readline.createInterface({
-      input: fs.createReadStream('keywords.txt'),
-      crlfDelay: Infinity
-    });
-
     res.set('Content-Type', 'application/javascript');
-    let response = 'const keywords = [';
-
-    rl.on('line', line => {
-      response += `"${line}",`;
-    });
-
-    rl.on('close', () => {
-      response += '];'
-      res.send(response);
-    });
+    res.send(clientConfigFile);
   });
 
   app.get('*', (req, res) => {
