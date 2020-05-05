@@ -52,7 +52,8 @@ function setupRoutes(clientConfigFile){
         res.send(result);
       })
       .catch(err => {
-        console.log('Failed to build response:', err.message);
+        console.log('Failed to build response:', err.message,
+          'Complete error:', err);
         res.status(500).send('500 Server Error.');
       });
   });
