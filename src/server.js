@@ -1,6 +1,8 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
+const readline = require('readline');
 const htmlBuilder = require('./html-builder');
 
 // Server setup
@@ -30,6 +32,25 @@ function setupRoutes(){
         console.log('Failed to build response:', err.message);
         res.status(500).send('500 Server Error.');
       });
+  });
+
+  app.get('/js/config.js', (req, res) => {
+    const rl = readline.createInterface({
+      input: fs.createReadStream('keywords.txt'),
+      crlfDelay: Infinity
+    });
+
+    res.set('Content-Type', 'application/javascript');
+    let response = 'const keywords = [';
+
+    rl.on('line', line => {
+      response += `"${line}",`;
+    });
+
+    rl.on('close', () => {
+      response += '];'
+      res.send(response);
+    });
   });
 
   app.get('*', (req, res) => {
