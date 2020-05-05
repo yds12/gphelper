@@ -3,12 +3,12 @@ const path = require('path');
 const fetcher = require('./fetcher');
 const extractor = require('./extractor');
 
-async function buildTemplate(template, url){
-  let data = await extractor.extract(url);
+async function buildTemplate(template){
+  let data = await extractor.extract();
 
   if(template === 'index'){
     let fileContent = await getFile(`html-template/${template}.html`);
-    let list = '<ul>';
+    let list = '<ul id="items">';
     for(let item of data){
       list += `<li><span class="source">${item.source}</span>`;
       list += `<a href="${item.link}">`;

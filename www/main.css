@@ -1,10 +1,17 @@
 body {
   font-family: 'Didact Gothic', sans;
   font-size: 18px;
+  color: #222222;
+  background: #fafafa;
+}
+
+mark.keyword{
+  background: #eeffee;
+  color: #000000;
 }
 
 a {
-  color: #111111;
+  color: #222222;
   text-decoration: none;
 }
 

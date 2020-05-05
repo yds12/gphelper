@@ -18,9 +18,10 @@ function start(configurations){
 }
 
 function setupRoutes(){
+  app.use(express.static(config.publicDir));
+
   app.get('/', (req, res) => {
-//    res.sendFile(path.join(__dirname, '..', config.publicDir, 'index.html'));
-    htmlBuilder.template('index', 'https://www.afp.com/pt')
+    htmlBuilder.template('index')
       .then(result => {
         console.log('HTML successfully built. Result size:', result.length);
         res.send(result);
@@ -30,8 +31,6 @@ function setupRoutes(){
         res.status(500).send('500 Server Error.');
       });
   });
-
-  app.use(express.static(config.publicDir));
 
   app.get('*', (req, res) => {
     console.log('Requested URL: ', req.url);
