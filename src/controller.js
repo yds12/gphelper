@@ -2,9 +2,31 @@ const fs = require('fs');
 const readline = require('readline');
 const extractor = require('./extractor');
 const htmlBuilder = require('./html-builder');
+const nodeCouchDb = require('node-couchdb');
 
 const keywordsFile = 'keywords.txt';
-let clientConfigFile, newsItems;
+let clientConfigFile, newsItems, db;
+
+function setup(config, callback){
+  setupDb(config.db);
+  buildClientConfigFile(callback);
+}
+
+function setupDb(config){
+  let db = new nodeCouchDb({
+    auth: {
+      user: config.user,
+      pass: config.pw
+  }});
+
+  db.listDatabases().then(dbs => {
+    console.log('Connected to database successfully! List of DBs:', dbs);
+  }, err => console.log('Error connecting to database: ', err.message));
+
+//  db.get('testdb', '_all_docs').then((data, headers, status) =>
+//    console.log('Query from testdb:', data), err =>
+//    console.log('Failed to query testdb'));
+}
 
 async function getItemsListPage(){
   newsItems = await extractor.extract();
@@ -35,6 +57,6 @@ function buildClientConfigFile(callback){
   });
 }
 
+module.exports.setup = setup;
 module.exports.getItemsListPage = getItemsListPage;
-module.exports.getClientConfigFile = getClientConfigFile;
 module.exports.buildClientConfigFile = buildClientConfigFile;

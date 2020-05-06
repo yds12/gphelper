@@ -16,7 +16,7 @@ function start(configurations){
   config = configurations;
   server.listen(config.port, () =>
     console.log(`Express server listening on port ${config.port}...`));
-  controller.buildClientConfigFile(() => {
+  controller.setup(configurations, () => {
     setupRoutes();
   });
 }

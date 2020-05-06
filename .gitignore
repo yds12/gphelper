@@ -2,3 +2,4 @@ node_modules
 keywords.txt
 cache/*
 !cache/.keep
+help
