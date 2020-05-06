@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const url_module = require('url');
-const fileHelper = require('./filehelper');
+const util = require('./util');
 
 const cacheDir = '../cache';
-const CACHE_EXP = 600; // in seconds
+const CACHE_EXP = 1800; // in seconds
 
 function getCacheFile(url){
   let parsedUrl = url_module.parse(url);
@@ -28,7 +28,7 @@ async function getCache(url){
   }
 
   console.log(`Cache file ${filename} is ${age}s old, and will be used.`);
-  return await fileHelper.getFileAbsolute(filename);
+  return await util.getFileAbsolute(filename);
 }
 
 function saveCache(url, content){

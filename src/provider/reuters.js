@@ -1,3 +1,4 @@
+const providerBase = require('../provider-base');
 const url = 'https://br.reuters.com/news/world';
 
 function cutHtml(htmlBody){
@@ -31,6 +32,7 @@ function assembleItems(ch, partialUrl, source){
     }
   });
 
+  providerBase.generateItemsId(items);
   return items;
 }
 

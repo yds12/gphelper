@@ -1,3 +1,4 @@
+const providerBase = require('../provider-base');
 const url = 'https://g1.globo.com/mundo/';
 
 function cutHtml(htmlBody){
@@ -15,6 +16,7 @@ function assembleItems(ch, partialUrl, source){
     });
   });
 
+  providerBase.generateItemsId(items);
   return items;
 }
 

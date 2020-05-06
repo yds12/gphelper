@@ -1,3 +1,4 @@
+const providerBase = require('../provider-base');
 const url = 'https://www.afp.com/pt';
 
 function cutHtml(htmlBody){
@@ -20,6 +21,7 @@ function assembleItems(ch, partialUrl, source){
     });
   });
 
+  providerBase.generateItemsId(items);
   return items;
 }
 
