@@ -10,7 +10,7 @@ function assembleItems(ch, partialUrl, source){
   ch('div._xn div.bastian-feed-item a.feed-post-link').each((i,e) => {
     items.push({ 
       title: ch(e).text(),
-      link: partialUrl + ch(e).attr('href'),
+      link: ch(e).attr('href'),
       source: source 
     });
   });
