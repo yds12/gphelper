@@ -1,11 +1,7 @@
 const path = require('path');
-const fetcher = require('./fetcher');
-const extractor = require('./extractor');
 const util = require('./util');
 
-async function buildTemplate(template){
-  let data = await extractor.extract();
-
+async function buildTemplate(template, data){
   if(template === 'index'){
     let fileContent = 
       await util.getFile(`html-template/${template}.html`);

@@ -1,11 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const fs = require('fs');
-const readline = require('readline');
-const htmlBuilder = require('./html-builder');
-
-const keywordsFile = 'keywords.txt';
+const controller = require('./controller');
 
 // Server setup
 const app = express();
@@ -18,35 +14,16 @@ function start(configurations){
   config = configurations;
   server.listen(config.port, () =>
     console.log(`Express server listening on port ${config.port}...`));
-  buildConfigFile((clientConfigFile) => {
-    setupRoutes(clientConfigFile);
+  controller.buildClientConfigFile(() => {
+    setupRoutes();
   });
 }
 
-function buildConfigFile(callback){
-  const rl = readline.createInterface({
-    input: fs.createReadStream(keywordsFile),
-    crlfDelay: Infinity
-  });
-
-  let configFileContent = 'const CONFIG = {};';
-  configFileContent += 'CONFIG.keywords = [';
-
-  rl.on('line', line => {
-    configFileContent += `"${line}",`;
-  });
-
-  rl.on('close', () => {
-    configFileContent += '];'
-    callback(configFileContent);
-  });
-}
-
-function setupRoutes(clientConfigFile){
+function setupRoutes(){
   app.use(express.static(config.publicDir));
 
   app.get('/', (req, res) => {
-    htmlBuilder.template('index')
+    controller.getItemsListPage()
       .then(result => {
         console.log('HTML successfully built. Result size:', result.length);
         res.send(result);
@@ -60,7 +37,7 @@ function setupRoutes(clientConfigFile){
 
   app.get('/js/config.js', (req, res) => {
     res.set('Content-Type', 'application/javascript');
-    res.send(clientConfigFile);
+    res.send(controller.getClientConfigFile());
   });
 
   app.get('*', (req, res) => {
