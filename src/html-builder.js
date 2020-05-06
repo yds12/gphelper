@@ -1,16 +1,17 @@
-const fs = require('fs').promises;
 const path = require('path');
-const fetcher = require('./fetcher');
-const extractor = require('./extractor');
+const util = require('./util');
 
-async function buildTemplate(template){
-  let data = await extractor.extract();
-
+async function buildTemplate(template, data){
   if(template === 'index'){
-    let fileContent = await getFile(`html-template/${template}.html`);
+    let fileContent = 
+      await util.getFile(`html-template/${template}.html`);
+
     let list = '<ul id="items">';
     for(let item of data){
-      list += `<li><span class="source">${item.source}</span>`;
+      list += `<li data-id="${item.id}">`;
+      list += '<input type="checkbox" class="good" title="Good"/>';
+      list += '<input type="checkbox" class="bad" title="Bad"/>';
+      list += `<span class="source">${item.source}</span>`;
       list += `<a href="${item.link}">`;
       list += `<span class="title">${item.title}</span></a></li>`;
     }
@@ -19,11 +20,6 @@ async function buildTemplate(template){
     return fileContent.replace('$$LINKS$$', list);
   }
   return '';
-}
-
-async function getFile(filename){
-  let data = await fs.readFile(path.join(__dirname, filename));
-  return data.toString();
 }
 
 module.exports.template = buildTemplate;

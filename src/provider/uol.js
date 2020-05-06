@@ -1,3 +1,4 @@
+const providerBase = require('../provider-base');
 const url = 'https://noticias.uol.com.br/internacional/';
 
 function cutHtml(htmlBody){
@@ -18,6 +19,7 @@ function assembleItems(ch, partialUrl, source){
     });
   });
 
+  providerBase.generateItemsId(items);
   return items;
 }
 

@@ -1,3 +1,4 @@
+const providerBase = require('../provider-base');
 const url = 'https://www.dw.com/pt-br/not%C3%ADcias/mundo/s-30734';
 
 function cutHtml(htmlBody){
@@ -17,6 +18,7 @@ function assembleItems(ch, partialUrl, source){
     });
   });
 
+  providerBase.generateItemsId(items);
   return items;
 }
 

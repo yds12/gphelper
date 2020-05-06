@@ -1,7 +1,11 @@
 const http = require('http');
 const https = require('https');
+const cacher = require('./cacher');
 
-function fetch(url){
+async function fetch(url){
+  let cache = await cacher.getCache(url);
+  if(cache) return cache;
+
   let lib;
 
   if(url.toLowerCase().startsWith('https://')) lib = https;
@@ -14,6 +18,7 @@ function fetch(url){
         data += chunk;
       });
       res.on('end', () => {
+        cacher.saveCache(url, data);
         resolve(data);
       });
     }).on('error', (err) => {
