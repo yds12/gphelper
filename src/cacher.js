@@ -4,7 +4,7 @@ const url_module = require('url');
 const util = require('./util');
 
 const cacheDir = '../cache';
-const CACHE_EXP = 1800; // in seconds
+const CACHE_EXP = 3000; // in seconds
 
 function getCacheFile(url){
   let parsedUrl = url_module.parse(url);

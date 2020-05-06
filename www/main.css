@@ -5,6 +5,10 @@ body {
   background: #fafafa;
 }
 
+ul {
+  list-style-type: none;
+}
+
 mark.keyword{
   background: #eeffee;
   color: #000000;

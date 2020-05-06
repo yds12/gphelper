@@ -8,6 +8,8 @@ const app = express();
 app.disable('x-powered-by');
 
 const server = http.createServer(app);
+app.use(express.json());
+
 let config;
 
 function start(configurations){
@@ -43,6 +45,11 @@ function setupRoutes(){
   app.get('*', (req, res) => {
     console.log('Requested URL: ', req.url);
     res.send();
+  });
+
+  app.post('/', (req, res) => {
+    console.log(req.body);
+    res.send('Received this content: ' + req.body);
   });
 }
 
