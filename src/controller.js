@@ -2,30 +2,14 @@ const fs = require('fs');
 const readline = require('readline');
 const extractor = require('./extractor');
 const htmlBuilder = require('./html-builder');
-const nodeCouchDb = require('node-couchdb');
+const tokenizer = require('./tokenizer');
+const dal = require('./dal');
 
-const keywordsFile = 'keywords.txt';
-let clientConfigFile, newsItems, db;
+let clientConfigFile, newsItems;
 
 function setup(config, callback){
-  setupDb(config.db);
-  buildClientConfigFile(callback);
-}
-
-function setupDb(config){
-  let db = new nodeCouchDb({
-    auth: {
-      user: config.user,
-      pass: config.pw
-  }});
-
-//  db.listDatabases().then(dbs => {
-//    console.log('Connected to database successfully! List of DBs:', dbs);
-//  }, err => console.log('Error connecting to database: ', err.message));
-
-  db.get(config.dbName, '_all_docs').then((data, headers, status) =>
-    console.log(`Query from ${config.dbName}:`, data), err =>
-    console.log(`Failed to query ${config.dbName}:`, err.message));
+  dal.setup(config.db);
+  buildClientConfigFile(config, callback);
 }
 
 async function getItemsListPage(){
@@ -37,9 +21,9 @@ function getClientConfigFile(){
   return clientConfigFile;
 }
 
-function buildClientConfigFile(callback){
+function buildClientConfigFile(config, callback){
   const rl = readline.createInterface({
-    input: fs.createReadStream(keywordsFile),
+    input: fs.createReadStream(config.keywordsFile),
     crlfDelay: Infinity
   });
 
@@ -57,7 +41,46 @@ function buildClientConfigFile(callback){
   });
 }
 
+function getItemsByIds(ids){
+  let items = [];
+
+  for(let id of ids){
+    let idx = newsItems.findIndex(item => item.id === id);
+    if(idx >= 0) items.push(newsItems[idx]);
+  }
+  return items;
+}
+
+function insertNewTokens(tokens){
+  let tokenIds = [];
+  return tokenIds;
+}
+
+function insertNewsItem(item){
+  console.log('Trying to insert item:', item);
+}
+
+function addExamples(goodIds, badIds){
+  const goodItems = getItemsByIds(goodIds);
+  const badItems = getItemsByIds(badIds);
+  const allItems = goodItems.concat(badItems);
+
+  for(let i = 0; i < allItems.length; i++){
+    let item = allItems[i];
+    let good = i <= goodItems.length;
+    let tokens = tokenizer.getTokens(item.text);
+    let tokenIds = insertNewTokens();
+    const itemDoc = {
+      id: item.id,
+      tokens: tokenIds,
+      good: good
+    };
+    insertNewsItem(itemDoc);
+  }
+}
+
 module.exports.setup = setup;
 module.exports.getItemsListPage = getItemsListPage;
 module.exports.buildClientConfigFile = buildClientConfigFile;
 module.exports.getClientConfigFile = getClientConfigFile;
+module.exports.addExamples = addExamples;

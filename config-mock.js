@@ -8,6 +8,7 @@ const CONFIG = {};
 CONFIG.localport = 3000;
 CONFIG.port = process.env.PORT || CONFIG.localport;
 CONFIG.publicDir = 'www';
+CONFIG.keywordsFile = 'keywords.txt';
 CONFIG.db = {
   dbName: 'mydb',
   host: 'localhost',

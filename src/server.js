@@ -49,8 +49,11 @@ function setupRoutes(){
   });
 
   app.post('/', (req, res) => {
-    console.log(req.body);
-    res.send('Received this content: ' + req.body);
+    if(req.body.bad && req.body.good){
+      controller.addExamples(req.body.good, req.body.bad);
+      res.send();
+    }
+    else console.log('Content received via POST is invalid.');
   });
 }
 
