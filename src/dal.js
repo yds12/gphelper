@@ -1,4 +1,7 @@
 const nodeCouchDb = require('node-couchdb');
+const tokenIdSingleton = require('./tokenid-singleton');
+
+const tokenIdView = '_design/token-ids/_view/token-ids';
 
 let db, dbName;
 
@@ -18,14 +21,30 @@ function testConnection(){
     console.log(`Failed to query ${dbName}:`, err.message));
 }
 
-function getNextTokenId(callback){
-  const viewUrl = '_design/token-ids/_view/token-ids';
-  db.get(dbName, viewUrl).then(({ data, headers, status }) => {
-    let id = data.rows[0].value + 1;
-    console.log('Token IDs query successful: ', data.rows[0].value);
-    callback(id);
+async function getNextTokenId(){
+  let id = 0;
+  
+  if(tokenIdSingleton.isBlocked()){
+    let p = new Promise((res, rej) => tokenIdSingleton.getAccess(res));
+    return p.then(() => {
+      id = tokenIdSingleton.lastId + 1;
+      tokenIdSingleton.lastId = id;
+      return id;
+    });
+  }
+  
+  tokenIdSingleton.getMutex();
+  return db.get(dbName, tokenIdView).then(({ data, headers, status }) => {
+    tokenIdSingleton.lastTime = Date.now();
+
+    const id = data.rows.length === 0 ? 1 : data.rows[0].value + 1;
+    tokenIdSingleton.lastId = id;
+    console.log('Token IDs query successful: ', id - 1);
+    tokenIdSingleton.freeMutex();
+    return id;
   }, err => {
-    console.log(`Error querying ${viewUrl}: ${err.message}`);
+    console.log(`Error querying ${tokenIdView}: ${err.message}`);
+    tokenIdSingleton.freeMutex();
     throw err;
   });
 }
@@ -37,18 +56,20 @@ function getNewsItem(id){
 }
 
 function addToken(token){
-  getNextTokenId(id => {
-    const tokenObj = {
-      _id: id.toString(),
-      value: token,
-      type: 'token'
-    };
+  const tokenObj = {
+    value: token,
+    type: 'token'
+  };
 
+  getNextTokenId().then(id => {
+    console.log('id received:',id);
+    tokenObj._id = id.toString();
     db.insert(dbName, tokenObj).then(({data, headers, status}) => {
       console.log(`Token ${tokenObj} inserted successfully in the DB.`);
-    }, err => {
-      console.log(`Error inserting ${tokenObj}: ${err.message}`);
     });
+  }).catch(err => {
+    throw err;
+    console.log(`Error inserting ${tokenObj}: ${err.message}`);
   });
 }
 
