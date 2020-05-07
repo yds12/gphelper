@@ -1,5 +1,4 @@
-const fs = require('fs');
-const readline = require('readline');
+const util = require('./util');
 const extractor = require('./extractor');
 const htmlBuilder = require('./html-builder');
 const tokenizer = require('./tokenizer');
@@ -8,7 +7,9 @@ const dal = require('./dal');
 let clientConfigFile, newsItems;
 
 function setup(config, callback){
+  tokenizer.initialize(config);
   dal.setup(config.db);
+  dal.testConnection();
   buildClientConfigFile(config, callback);
 }
 
@@ -22,19 +23,12 @@ function getClientConfigFile(){
 }
 
 function buildClientConfigFile(config, callback){
-  const rl = readline.createInterface({
-    input: fs.createReadStream(config.keywordsFile),
-    crlfDelay: Infinity
-  });
-
   let configFileContent = 'const CONFIG = {};';
   configFileContent += 'CONFIG.keywords = [';
 
-  rl.on('line', line => {
+  util.readLines(config.keywordsFile, (line) => {
     configFileContent += `"${line}",`;
-  });
-
-  rl.on('close', () => {
+  }, () => {
     configFileContent += '];'
     clientConfigFile = configFileContent;
     callback();
@@ -53,11 +47,15 @@ function getItemsByIds(ids){
 
 function insertNewTokens(tokens){
   let tokenIds = [];
+
+  for(let token of tokens){
+    dal.addToken(token);
+  }
   return tokenIds;
 }
 
 function insertNewsItem(item){
-  console.log('Trying to insert item:', item);
+//  console.log('Trying to insert item:', item);
 }
 
 function addExamples(goodIds, badIds){
@@ -68,8 +66,8 @@ function addExamples(goodIds, badIds){
   for(let i = 0; i < allItems.length; i++){
     let item = allItems[i];
     let good = i <= goodItems.length;
-    let tokens = tokenizer.getTokens(item.text);
-    let tokenIds = insertNewTokens();
+    let tokens = tokenizer.getTokens(item.title);
+    let tokenIds = insertNewTokens(tokens);
     const itemDoc = {
       id: item.id,
       tokens: tokenIds,
