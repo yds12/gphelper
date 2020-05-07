@@ -1,4 +1,7 @@
 node_modules
 keywords.txt
+blacklist.txt
 cache/*
 !cache/.keep
+help
+config.js

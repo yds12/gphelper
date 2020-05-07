@@ -13,10 +13,11 @@ app.use(express.json());
 let config;
 
 function start(configurations){
+  console.log('Configurations received:', configurations);
   config = configurations;
   server.listen(config.port, () =>
     console.log(`Express server listening on port ${config.port}...`));
-  controller.buildClientConfigFile(() => {
+  controller.setup(configurations, () => {
     setupRoutes();
   });
 }
@@ -48,8 +49,11 @@ function setupRoutes(){
   });
 
   app.post('/', (req, res) => {
-    console.log(req.body);
-    res.send('Received this content: ' + req.body);
+    if(req.body.bad && req.body.good){
+      controller.addExamples(req.body.good, req.body.bad);
+      res.send();
+    }
+    else console.log('Content received via POST is invalid.');
   });
 }
 
