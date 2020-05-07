@@ -60,3 +60,4 @@ function buildClientConfigFile(callback){
 module.exports.setup = setup;
 module.exports.getItemsListPage = getItemsListPage;
 module.exports.buildClientConfigFile = buildClientConfigFile;
+module.exports.getClientConfigFile = getClientConfigFile;

@@ -24,15 +24,19 @@ async function extract(){
   elements = [];
 
   for(let provider of providers){
-    let source = await fetcher.fetch(provider.url);
-    source = provider.cutHtml(source);
-    let ch = cheerio.load(source);
-    let parsedUrl = url_module.parse(provider.url);
-    let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
+    try{
+      let source = await fetcher.fetch(provider.url);
+      source = provider.cutHtml(source);
+      let ch = cheerio.load(source);
+      let parsedUrl = url_module.parse(provider.url);
+      let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
 
-    elements = elements.concat(
-      provider.assembleItems(ch, partialUrl,
-        parsedUrl.hostname.toLowerCase().replace('www.', '')));
+      elements = elements.concat(
+        provider.assembleItems(ch, partialUrl,
+          parsedUrl.hostname.toLowerCase().replace('www.', '')));
+    } catch(err){
+      console.log('Error while fetching data from provider:', err.message);
+    }
   }
 
   shuffle(elements);
