@@ -1,13 +1,12 @@
 const server = require('./src/server.js');
-const CONFIG = {};
-CONFIG.localport = 3000;
-CONFIG.port = process.env.PORT || CONFIG.localport;
-CONFIG.publicDir = 'www';
-CONFIG.db = {
-  host: 'localhost',
-  protocol: 'http',
-  port: 5984,
-  user: 'admin',
-  pw: 'password'
-};
-server.start(CONFIG);
+let config;
+
+try{
+  config = require('./config.js');
+} catch(err){
+  console.log('ERROR: File config.js must be present at the root directory. ' +
+    'Try using config-mock.js as a model for it.', err.message);
+  return;
+}
+
+server.start(config);

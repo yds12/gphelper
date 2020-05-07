@@ -13,6 +13,7 @@ app.use(express.json());
 let config;
 
 function start(configurations){
+  console.log('Configurations received:', configurations);
   config = configurations;
   server.listen(config.port, () =>
     console.log(`Express server listening on port ${config.port}...`));

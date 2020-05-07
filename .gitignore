@@ -3,3 +3,4 @@ keywords.txt
 cache/*
 !cache/.keep
 help
+config.js

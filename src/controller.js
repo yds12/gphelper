@@ -19,13 +19,13 @@ function setupDb(config){
       pass: config.pw
   }});
 
-  db.listDatabases().then(dbs => {
-    console.log('Connected to database successfully! List of DBs:', dbs);
-  }, err => console.log('Error connecting to database: ', err.message));
+//  db.listDatabases().then(dbs => {
+//    console.log('Connected to database successfully! List of DBs:', dbs);
+//  }, err => console.log('Error connecting to database: ', err.message));
 
-//  db.get('testdb', '_all_docs').then((data, headers, status) =>
-//    console.log('Query from testdb:', data), err =>
-//    console.log('Failed to query testdb'));
+  db.get(config.dbName, '_all_docs').then((data, headers, status) =>
+    console.log(`Query from ${config.dbName}:`, data), err =>
+    console.log(`Failed to query ${config.dbName}:`, err.message));
 }
 
 async function getItemsListPage(){
