@@ -8,6 +8,11 @@ const providers = [
   require('./provider/uol'),
   require('./provider/g1'),
   require('./provider/dw'),
+  require('./provider/un'),
+  require('./provider/carta-capital'),
+  require('./provider/elpais'),
+  require('./provider/lemonde'),
+  require('./provider/em'),
 ];
 
 // should be in a separate helper
@@ -25,7 +30,7 @@ async function extract(){
 
   for(let provider of providers){
     try{
-      let source = await fetcher.fetch(provider.url);
+      let source = await fetcher.fetch(provider.url, provider.encoding);
       source = provider.cutHtml(source);
       let ch = cheerio.load(source);
       let parsedUrl = url_module.parse(provider.url);

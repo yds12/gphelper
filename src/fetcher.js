@@ -2,7 +2,9 @@ const http = require('http');
 const https = require('https');
 const cacher = require('./cacher');
 
-async function fetch(url){
+async function fetch(url, encoding){
+  if(!encoding) encoding = 'utf-8';
+
   let cache = await cacher.getCache(url);
   if(cache) return cache;
 
