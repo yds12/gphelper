@@ -46,17 +46,9 @@ function getItemsByIds(ids){
 }
 
 function insertNewTokens(tokens){
-  let tokenIds = [];
   let insertionPromises = [];
-
-  for(let token of tokens){
+  for(let token of tokens)
     insertionPromises.push(dal.addToken(token));
-    dal.addToken(token)
-      .then(id => {
-        tokenIds.push(id);
-      }).catch(err => {
-      });
-  }
 
   return Promise.all(insertionPromises);
 }
