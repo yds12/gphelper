@@ -18,9 +18,9 @@ function setGoodBadIds(e){
   let arr, checked, id;
 
   switch(e.target.className){
-    case 'bad': arr = good;
+    case 'bad': arr = bad;
       break;
-    case 'good': arr = bad;
+    case 'good': arr = good;
       break;
     default: return;
   }

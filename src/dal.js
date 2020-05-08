@@ -3,6 +3,7 @@ const mutex = require('./mutex');
 
 const tokenIdView = '_design/token-ids/_view/token-ids';
 const tokenByValueView = '_design/token-by-value/_view/token-by-value';
+const headlinesView = '_design/headlines/_view/headlines';
 
 let db, dbName;
 
@@ -20,6 +21,35 @@ function testConnection(){
   db.get(dbName, '_all_docs').then((data, headers, status) =>
     console.log(`Query from ${dbName}:`, data), err =>
     console.log(`Failed to query ${dbName}:`, err.message));
+}
+
+function headlineExists(id){
+  const queryOptions = { key: id };
+
+  return db.get(dbName, headlinesView, queryOptions)
+    .then(({ data, headers, status }) => {
+      if(data){
+        if(data.rows.length > 0 && data.rows.id)
+          return true;
+        else return false;
+      }
+      else throw Error(`Headline query failed for ID=${id}!`);
+    }, err => console.log('Query failed:', err.message));
+}
+
+function insertHeadline(headline){
+  const headlineObj = {
+    _id: headline.id,
+    type: 'headline',
+    tokens: headline.tokens,
+    good: headline.good
+  };
+
+  db.insert(dbName, headlineObj).then(({ data, headers, status }) => {
+    console.log(`Headline ID=${headline.id} inserted successfully.`);
+  }).catch(err => 
+    console.log(`Error inserting headline ID=${headline.id}. Error:`,
+      err.message));
 }
 
 function getTokenId(token){
@@ -62,12 +92,6 @@ async function getNextTokenId(){
   });
 }
 
-function getNewsItem(id){
-  db.get(dbName, id).then(({ data, headers, status }) => {
-  }, err => {
-  });
-}
-
 async function addToken(token){
   const tokenObj = {
     value: token,
@@ -89,5 +113,6 @@ async function addToken(token){
 
 module.exports.setup = setup;
 module.exports.testConnection = testConnection;
-module.exports.getNewsItem = getNewsItem;
 module.exports.addToken = addToken;
+module.exports.headlineExists = headlineExists;
+module.exports.insertHeadline = insertHeadline;
