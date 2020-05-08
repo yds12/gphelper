@@ -47,18 +47,25 @@ function getItemsByIds(ids){
 
 function insertNewTokens(tokens){
   let tokenIds = [];
+  let insertionPromises = [];
 
   for(let token of tokens){
-    dal.addToken(token);
+    insertionPromises.push(dal.addToken(token));
+    dal.addToken(token)
+      .then(id => {
+        tokenIds.push(id);
+      }).catch(err => {
+      });
   }
-  return tokenIds;
+
+  return Promise.all(insertionPromises);
 }
 
 function insertNewsItem(item){
 //  console.log('Trying to insert item:', item);
 }
 
-function addExamples(goodIds, badIds){
+async function addExamples(goodIds, badIds){
   const goodItems = getItemsByIds(goodIds);
   const badItems = getItemsByIds(badIds);
   const allItems = goodItems.concat(badItems);
@@ -67,13 +74,19 @@ function addExamples(goodIds, badIds){
     let item = allItems[i];
     let good = i <= goodItems.length;
     let tokens = tokenizer.getTokens(item.title);
-    let tokenIds = insertNewTokens(tokens);
-    const itemDoc = {
-      id: item.id,
-      tokens: tokenIds,
-      good: good
-    };
-    insertNewsItem(itemDoc);
+
+    try{
+      let tokenIds = await insertNewTokens(tokens);
+
+      const itemDoc = {
+        id: item.id,
+        tokens: tokenIds,
+        good: good
+      };
+      insertNewsItem(itemDoc);
+    } catch(err) {
+      console.log('Error inserting tokens/items. Error:', err.message);
+    }
   }
 }
 
