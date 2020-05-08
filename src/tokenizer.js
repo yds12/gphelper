@@ -25,7 +25,7 @@ function isBlacklisted(word){
 function removePunctuation(word){
 //  word = word.replace(/(^\-|\-$)/g, ''); // remove leading/trailing dashes
   return word.replace(
-    /[~`!@#$%^&\*\(\)\{\}\[\];:"\'<,\.>\?\/\\\|_\+=]/g, '');
+    /[~`!@#%^&\*\(\)\{\}\[\];:"\'<,\.>\?\/\\\|_\+=]/g, '');
 }
 
 function replaceSpecialChars(word){
@@ -47,6 +47,11 @@ function getTokens(text){
       continue;
     }
 
+    if(word.indexOf('$') >= 0){
+      tokens.push('_MONEY_');
+      continue;
+    }
+
     word = word.toLowerCase();
     if(isBlacklisted(word)) continue;
 
@@ -56,6 +61,7 @@ function getTokens(text){
     tokens.push(word);
   }
 
+  tokens = util.removeDuplicates(tokens);
   return tokens;
 }
 

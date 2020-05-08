@@ -32,6 +32,11 @@ function getHash(str){
   return crypto.createHash('md5').update(str).digest('hex');
 }
 
+function removeDuplicates(arr){
+  return arr.filter((v, i, self) => self.indexOf(v) === i);
+}
+
+module.exports.removeDuplicates = removeDuplicates;
 module.exports.getFile = getFile;
 module.exports.getFileAbsolute = getFileAbsolute;
 module.exports.readLines = readLines;

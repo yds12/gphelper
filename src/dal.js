@@ -1,7 +1,9 @@
 const nodeCouchDb = require('node-couchdb');
-const tokenIdSingleton = require('./tokenid-singleton');
+const mutex = require('./mutex');
 
 const tokenIdView = '_design/token-ids/_view/token-ids';
+const tokenByValueView = '_design/token-by-value/_view/token-by-value';
+const headlinesView = '_design/headlines/_view/headlines';
 
 let db, dbName;
 
@@ -21,59 +23,96 @@ function testConnection(){
     console.log(`Failed to query ${dbName}:`, err.message));
 }
 
+function headlineExists(id){
+  const queryOptions = { key: id };
+
+  return db.get(dbName, headlinesView, queryOptions)
+    .then(({ data, headers, status }) => {
+      if(data){
+        if(data.rows.length > 0 && data.rows.id)
+          return true;
+        else return false;
+      }
+      else throw Error(`Headline query failed for ID=${id}!`);
+    }, err => console.log('Query failed:', err.message));
+}
+
+function insertHeadline(headline){
+  const headlineObj = {
+    _id: headline.id,
+    type: 'headline',
+    tokens: headline.tokens,
+    good: headline.good
+  };
+
+  db.insert(dbName, headlineObj).then(({ data, headers, status }) => {
+    console.log(`Headline ID=${headline.id} inserted successfully.`);
+  }).catch(err => 
+    console.log(`Error inserting headline ID=${headline.id}. Error:`,
+      err.message));
+}
+
+function getTokenId(token){
+  const queryOptions = { key: token };
+
+  return db.get(dbName, tokenByValueView, queryOptions)
+    .then(({ data, headers, status }) => {
+      if(data && data.rows.length > 0 && !isNaN(data.rows[0].id))
+        return +data.rows[0].id;
+      else return -1;
+    }, err => console.log('Query failed:', err.message));
+}
+
 async function getNextTokenId(){
   let id = 0;
   
-  if(tokenIdSingleton.isBlocked()){
-    let p = new Promise((res, rej) => tokenIdSingleton.getAccess(res));
+  // If mutex is locked, waits until the first request to query the ID
+  // returns, then use/increment this ID (stored at a singleton).
+  if(mutex.tokenId.isBlocked()){
+    let p = new Promise((res, rej) => mutex.tokenId.getAccess(res));
     return p.then(() => {
-      id = tokenIdSingleton.lastId + 1;
-      tokenIdSingleton.lastId = id;
+      id = mutex.tokenId.lastId + 1;
+      mutex.tokenId.lastId = id;
       return id;
     });
   }
   
-  tokenIdSingleton.getMutex();
+  // Only one query at a time to get the last ID in the DB. Locks mutex.
+  mutex.tokenId.getMutex();
   return db.get(dbName, tokenIdView).then(({ data, headers, status }) => {
-    tokenIdSingleton.lastTime = Date.now();
-
     const id = data.rows.length === 0 ? 1 : data.rows[0].value + 1;
-    tokenIdSingleton.lastId = id;
+    mutex.tokenId.lastId = id;
     console.log('Token IDs query successful: ', id - 1);
-    tokenIdSingleton.freeMutex();
+    mutex.tokenId.freeMutex();
     return id;
   }, err => {
     console.log(`Error querying ${tokenIdView}: ${err.message}`);
-    tokenIdSingleton.freeMutex();
+    mutex.tokenId.freeMutex();
     throw err;
   });
 }
 
-function getNewsItem(id){
-  db.get(dbName, id).then(({ data, headers, status }) => {
-  }, err => {
-  });
-}
-
-function addToken(token){
+async function addToken(token){
   const tokenObj = {
     value: token,
     type: 'token'
   };
 
-  getNextTokenId().then(id => {
-    console.log('id received:',id);
-    tokenObj._id = id.toString();
-    db.insert(dbName, tokenObj).then(({data, headers, status}) => {
-      console.log(`Token ${tokenObj} inserted successfully in the DB.`);
-    });
-  }).catch(err => {
-    throw err;
-    console.log(`Error inserting ${tokenObj}: ${err.message}`);
-  });
+  let existingId = await getTokenId(token);
+  if(existingId > -1){
+    console.log(`Token ${token} ID=${existingId} already exists.`);
+    return existingId;
+  }
+
+  let newId = await getNextTokenId();
+  tokenObj._id = newId.toString();
+  let { data, headers, status } = await db.insert(dbName, tokenObj);
+  console.log(`Token ${token} ID=${newId} inserted successfully.`);
+  return newId;
 }
 
 module.exports.setup = setup;
 module.exports.testConnection = testConnection;
-module.exports.getNewsItem = getNewsItem;
 module.exports.addToken = addToken;
+module.exports.headlineExists = headlineExists;
+module.exports.insertHeadline = insertHeadline;
