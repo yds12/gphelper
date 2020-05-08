@@ -1,5 +1,5 @@
 const nodeCouchDb = require('node-couchdb');
-const tokenIdSingleton = require('./tokenid-singleton');
+const mutex = require('./mutex');
 
 const tokenIdView = '_design/token-ids/_view/token-ids';
 const tokenByValueView = '_design/token-by-value/_view/token-by-value';
@@ -38,28 +38,26 @@ async function getNextTokenId(){
   
   // If mutex is locked, waits until the first request to query the ID
   // returns, then use/increment this ID (stored at a singleton).
-  if(tokenIdSingleton.isBlocked()){
-    let p = new Promise((res, rej) => tokenIdSingleton.getAccess(res));
+  if(mutex.tokenId.isBlocked()){
+    let p = new Promise((res, rej) => mutex.tokenId.getAccess(res));
     return p.then(() => {
-      id = tokenIdSingleton.lastId + 1;
-      tokenIdSingleton.lastId = id;
+      id = mutex.tokenId.lastId + 1;
+      mutex.tokenId.lastId = id;
       return id;
     });
   }
   
   // Only one query at a time to get the last ID in the DB. Locks mutex.
-  tokenIdSingleton.getMutex();
+  mutex.tokenId.getMutex();
   return db.get(dbName, tokenIdView).then(({ data, headers, status }) => {
-    tokenIdSingleton.lastTime = Date.now();
-
     const id = data.rows.length === 0 ? 1 : data.rows[0].value + 1;
-    tokenIdSingleton.lastId = id;
+    mutex.tokenId.lastId = id;
     console.log('Token IDs query successful: ', id - 1);
-    tokenIdSingleton.freeMutex();
+    mutex.tokenId.freeMutex();
     return id;
   }, err => {
     console.log(`Error querying ${tokenIdView}: ${err.message}`);
-    tokenIdSingleton.freeMutex();
+    mutex.tokenId.freeMutex();
     throw err;
   });
 }
