@@ -1,13 +1,15 @@
 const nodeCouchDb = require('node-couchdb');
 const mutex = require('./mutex');
 
-const tokenIdView = '_design/token-ids/_view/token-ids';
-const tokenByValueView = '_design/token-by-value/_view/token-by-value';
-const headlinesView = '_design/headlines/_view/headlines';
 
-let db, dbName;
+let db, dbName, designDocument, tokenIdView, tokenByValueView, headlinesView;
 
 function setup(config){
+  designDocument = config.designDocument;
+  tokenIdView = `_design/${designDocument}/_view/token-ids`;
+  tokenByValueView = `_design/${designDocument}/_view/token-by-value`;
+  headlinesView = `_design/${designDocument}/_view/headlines`;
+
   db = new nodeCouchDb({
     auth: {
       user: config.user,
@@ -29,12 +31,11 @@ function headlineExists(id){
   return db.get(dbName, headlinesView, queryOptions)
     .then(({ data, headers, status }) => {
       if(data){
-        if(data.rows.length > 0 && data.rows.id)
-          return true;
+        if(data.rows.length > 0 && data.rows[0].id) return true;
         else return false;
       }
       else throw Error(`Headline query failed for ID=${id}!`);
-    }, err => console.log('Query failed:', err.message));
+    }, err => console.log('Query failed:', err));
 }
 
 function insertHeadline(headline){
@@ -106,8 +107,13 @@ async function addToken(token){
 
   let newId = await getNextTokenId();
   tokenObj._id = newId.toString();
-  let { data, headers, status } = await db.insert(dbName, tokenObj);
-  console.log(`Token ${token} ID=${newId} inserted successfully.`);
+  try{
+    let { data, headers, status } = await db.insert(dbName, tokenObj);
+    console.log(`Token ${token} ID=${newId} inserted successfully.`);
+  } catch(err) {
+    console.log(`Failed to insert token ${token} ID=${newId}. Error:`,
+      err.message);
+  }
   return newId;
 }
 

@@ -16,7 +16,8 @@ CONFIG.db = {
   protocol: 'http',
   port: 5984,
   user: 'adm',
-  pw: '123456'
+  pw: '123456',
+  designDocument: 'mainDesignDocument'
 };
 
 module.exports = CONFIG;
