@@ -1,19 +1,7 @@
 const url_module = require('url');
 const cheerio = require('cheerio');
 const fetcher = require('./fetcher');
-
-const providers = [
-  require('./provider/afp'),
-  require('./provider/reuters'),
-  require('./provider/uol'),
-  require('./provider/g1'),
-  require('./provider/dw'),
-  require('./provider/un'),
-  require('./provider/carta-capital'),
-  require('./provider/elpais'),
-  require('./provider/lemonde'),
-  require('./provider/em'),
-];
+const providerFactory = require('./provider-factory');
 
 // should be in a separate helper
 function shuffle(array){
@@ -27,6 +15,7 @@ function shuffle(array){
 
 async function extract(){
   elements = [];
+  const providers = providerFactory.getProviders();
 
   for(let provider of providers){
     try{
