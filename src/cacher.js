@@ -11,7 +11,7 @@ function getCacheFile(url){
   return path.join(__dirname, cacheDir, parsedUrl.host + '.html');
 }
 
-async function getCache(url){
+async function getCache(url, encoding){
   let filename = getCacheFile(url);
   if(!fs.existsSync(filename)) {
     console.log(`No cache file ${filename}.`);
@@ -28,16 +28,18 @@ async function getCache(url){
   }
 
   console.log(`Cache file ${filename} is ${age}s old, and will be used.`);
-  return await util.getFileAbsolute(filename);
+  return await util.getFileAbsolute(filename, encoding);
 }
 
-function saveCache(url, content){
+function saveCache(url, content, encoding){
   let filename = getCacheFile(url);
-
-  fs.writeFile(filename, content, err => {
-    if(err) console.log('Error reading file:', err.message);
-    else console.log(`Cached ${filename}.`);
-  });
+  try{
+    util.saveFileAbsolute(filename, content, encoding);
+  } catch(err) {
+    console.log('Error saving file:', err.message);
+    return;
+  }
+  console.log(`Cached ${filename}.`);
 }
 
 module.exports.getCache = getCache;

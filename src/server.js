@@ -50,7 +50,6 @@ function setupRoutes(){
 
   app.post('/', (req, res) => {
     if(req.body.bad && req.body.good){
-      console.log('good:', req.body.good, 'bad:', req.body.bad);
       controller.addExamples(req.body.good, req.body.bad);
       res.send();
     }
