@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const iconv = require('iconv-lite');
 const cacher = require('./cacher');
 
 async function fetch(url, encoding){
@@ -15,11 +16,14 @@ async function fetch(url, encoding){
 
   return new Promise((resolve, reject) => {
     lib.get(url, (res) => {
+      let converterStream = iconv.decodeStream(encoding);
+      res.pipe(converterStream);
+
       let data = '';
-      res.on('data', (chunk) => {
+      converterStream.on('data', (chunk) => {
         data += chunk;
       });
-      res.on('end', () => {
+      converterStream.on('end', () => {
         cacher.saveCache(url, data);
         resolve(data);
       });
