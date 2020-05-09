@@ -36,21 +36,61 @@ function initialize(){
   };
 
 
-  // Set providers' assembleItems method
-  provAfp.assembleItems = (ch, partialUrl) => {
-    items = [];
+  // Set providers' assembleItems method or just add parts to the processing
+  // pipeline
+  provAfp.addItemsPipeline({
+    mainFilter: 'h3 a'
+  });
 
-    ch('h3 a').each((i,e) => {
-      items.push({ 
-        title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href')
-      });
-    });
-    return items;
-  };
+  provUol.addItemsPipeline({
+    mainFilter: 'div.results-items',
+    useChildren: true,
+    otherFilters: [ 'h3', 'a' ],
+    titleElementIdx: 0,
+    urlElementIdx: 1
+  });
+
+  provDw.addItemsPipeline({
+    mainFilter: 'div.news, div.linkList',
+    otherFilters: [ 'h2', 'a' ],
+    titleElementIdx: 0,
+    urlElementIdx: 1
+  });
+
+  provG1.addItemsPipeline({
+    mainFilter: 'div._xn div.bastian-feed-item a.feed-post-link'
+  });
+
+  provUn.addItemsPipeline({
+    mainFilter: 'h1.story-title',
+    otherFilters: ['a'],
+    titleElementIdx: 0,
+    urlElementIdx: 0
+  });
+
+  provEm.addItemsPipeline({
+    mainFilter: 'div.news-box h4 a'
+  });
+  
+  provLemonde.addItemsPipeline({
+    mainFilter: 'div.card-featured-black',
+    otherFilters: [ 'h2', 'a' ],
+    titleElementIdx: 0,
+    urlElementIdx: 1
+  });
+  provLemonde.addItemsPipeline({
+    mainFilter: 'div.card-clean',
+    otherFilters: [ 'h4', 'a' ],
+    titleElementIdx: 0,
+    urlElementIdx: 1
+  });
+
+  provCarta.addItemsPipeline({
+    mainFilter: '#nav-menu-item-45572 a.eltdf-pt-link'
+  });
 
   provReuters.assembleItems = (ch, partialUrl) => {
-    items = [];
+    let items = [];
 
     ch('h4 a').each((i,e) => {
       items.push({ 
@@ -75,74 +115,8 @@ function initialize(){
     return items;
   };
  
-  provUol.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('div.results-items').children().each((i,e) => {
-      let aEl = ch(e).find('a').first();
-      let h3 = ch(e).find('h3').first();
-
-      items.push({ 
-        title: h3.text(),
-        link: aEl.attr('href')
-      });
-    });
-    return items;
-  };
- 
-  provDw.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('div.news, div.linkList').each((i,e) => {
-      let aEl = ch(e).find('a');
-      let h2 = ch(e).find('h2');
-      items.push({ 
-        title: h2.text(),
-        link: partialUrl + aEl.attr('href')
-      });
-    });
-    return items;
-  };
- 
-  provG1.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('div._xn div.bastian-feed-item a.feed-post-link').each((i,e) => {
-      items.push({ 
-        title: ch(e).text(),
-        link: ch(e).attr('href')
-      });
-    });
-    return items;
-  };
- 
-  provUn.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('h1.story-title').each((i,e) => {
-      let aEl = ch(e).find('a');
-      items.push({ 
-        title: aEl.text(),
-        link: partialUrl + aEl.attr('href')
-      });
-    });
-    return items;
-  };
- 
-  provEm.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('div.news-box h4 a').each((i,e) => {
-      items.push({ 
-        title: ch(e).text(),
-        link: ch(e).attr('href')
-      });
-    });
-    return items;
-  };
- 
   provElpais.assembleItems = (ch, partialUrl) => {
-    items = [];
+    let items = [];
 
     ch('article.story_card script').each((i,e) => {
       try{
@@ -155,41 +129,6 @@ function initialize(){
       } catch(err) {
         console.log('Error processing El Pais data:', err);
       }
-    });
-    return items;
-  };
- 
-  provLemonde.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('div.card-featured-black').each((i,e) => {
-      let aEl = ch(e).find('a');
-      let h = ch(e).find('h2');
-      items.push({ 
-        title: h.text(),
-        link: aEl.attr('href')
-      });
-    });
-    
-    ch('div.card-clean').each((i,e) => {
-      let aEl = ch(e).find('a');
-      let h = ch(e).find('h4');
-      items.push({ 
-        title: h.text(),
-        link: aEl.attr('href')
-      });
-    });
-    return items;
-  };
- 
-  provCarta.assembleItems = (ch, partialUrl) => {
-    items = [];
-
-    ch('#nav-menu-item-45572 * a.eltdf-pt-link').each((i,e) => {
-      items.push({ 
-        title: ch(e).text(),
-        link: ch(e).attr('href')
-      });
     });
     return items;
   };

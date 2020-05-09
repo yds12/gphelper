@@ -25,11 +25,13 @@ async function extract(){
       let parsedUrl = url_module.parse(provider.url);
       let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
 
-      elements = elements.concat(
-        provider.getItems(ch, partialUrl,
-          parsedUrl.hostname.toLowerCase().replace('www.', '')));
+      let website = parsedUrl.hostname.toLowerCase()
+        .replace(/(^www\.|\.com\.br$|\.com$|\.org$|\.org\.br$)/g, '');
+
+      elements = elements.concat(provider.getItems(ch, partialUrl, website));
     } catch(err){
       console.log('Error while fetching data from provider:', err.message);
+      throw err;
     }
   }
 
