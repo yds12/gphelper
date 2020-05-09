@@ -4,9 +4,7 @@ const iconv = require('iconv-lite');
 const cacher = require('./cacher');
 
 async function fetch(url, encoding){
-  if(!encoding) encoding = 'utf-8';
-
-  let cache = await cacher.getCache(url);
+  let cache = await cacher.getCache(url, encoding);
   if(cache) return cache;
 
   let lib;
@@ -16,6 +14,7 @@ async function fetch(url, encoding){
 
   return new Promise((resolve, reject) => {
     lib.get(url, (res) => {
+      console.log('Fetching ', url);
       let converterStream = iconv.decodeStream(encoding);
       res.pipe(converterStream);
 
@@ -24,7 +23,7 @@ async function fetch(url, encoding){
         data += chunk;
       });
       converterStream.on('end', () => {
-        cacher.saveCache(url, data);
+        cacher.saveCache(url, data, encoding);
         resolve(data);
       });
     }).on('error', (err) => {

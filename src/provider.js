@@ -3,7 +3,7 @@ const util = require('./util');
 class Provider {
   constructor(url, encoding){
     this.url = url;
-    this.encoding = encoding | 'utf-8';
+    this.encoding = encoding || 'utf-8';
   }
 
   cutHtml(htmlBody){
@@ -11,14 +11,21 @@ class Provider {
   }
 
   getItems(ch, partialUrl, source){
-    const items = this.assembleItems(ch, partialUrl, source);
+    const items = this.assembleItems(ch, partialUrl);
+    this.generateItemsSource(items, source);
     this.generateItemsId(items);
     return items;
   }
 
-  assembleItems(ch, partialUrl, source){
+  assembleItems(ch, partialUrl){
     items = [];
     return items;
+  }
+
+  generateItemsSource(items, source){
+    for(let item of items){
+      item.source = source;
+    }
   }
 
   generateItemsId(items){

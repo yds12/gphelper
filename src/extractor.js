@@ -26,7 +26,7 @@ async function extract(){
       let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
 
       elements = elements.concat(
-        provider.assembleItems(ch, partialUrl,
+        provider.getItems(ch, partialUrl,
           parsedUrl.hostname.toLowerCase().replace('www.', '')));
     } catch(err){
       console.log('Error while fetching data from provider:', err.message);

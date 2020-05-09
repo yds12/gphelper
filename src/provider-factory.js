@@ -1,7 +1,7 @@
 const Provider = require('./provider');
 
 const providers = [];
-const initialized = false;
+let initialized = false;
 
 function getProviders(){
   if(!initialized) initialize();
@@ -37,49 +37,45 @@ function initialize(){
 
 
   // Set providers' assembleItems method
-  provAfp.assembleItems = (ch, partialUrl, source) => {
+  provAfp.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('h3 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href'),
-        source: source 
+        link: partialUrl + ch(e).attr('href')
       });
     });
     return items;
   };
 
-  provReuters.assembleItems = (ch, partialUrl, source) => {
+  provReuters.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('h4 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href'),
-        source: source 
+        link: partialUrl + ch(e).attr('href')
       });
     });
     ch('h5 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href'),
-        source: source 
+        link: partialUrl + ch(e).attr('href')
       });
     });
     ch('div.headlineMed a').each((i,e) => {
       if(ch(e).siblings().length > 0){
         items.push({ 
           title: ch(e).text(),
-          link: partialUrl + ch(e).attr('href'),
-          source: source 
+          link: partialUrl + ch(e).attr('href')
         });
       }
     });
     return items;
   };
  
-  provUol.assembleItems = (ch, partialUrl, source) => {
+  provUol.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('div.results-items').children().each((i,e) => {
@@ -88,14 +84,13 @@ function initialize(){
 
       items.push({ 
         title: h3.text(),
-        link: aEl.attr('href'),
-        source: source 
+        link: aEl.attr('href')
       });
     });
     return items;
   };
  
-  provDw.assembleItems = (ch, partialUrl, source) => {
+  provDw.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('div.news, div.linkList').each((i,e) => {
@@ -103,54 +98,50 @@ function initialize(){
       let h2 = ch(e).find('h2');
       items.push({ 
         title: h2.text(),
-        link: partialUrl + aEl.attr('href'),
-        source: source 
+        link: partialUrl + aEl.attr('href')
       });
     });
     return items;
   };
  
-  provG1.assembleItems = (ch, partialUrl, source) => {
+  provG1.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('div._xn div.bastian-feed-item a.feed-post-link').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: ch(e).attr('href'),
-        source: source 
+        link: ch(e).attr('href')
       });
     });
     return items;
   };
  
-  provUn.assembleItems = (ch, partialUrl, source) => {
+  provUn.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('h1.story-title').each((i,e) => {
       let aEl = ch(e).find('a');
       items.push({ 
         title: aEl.text(),
-        link: partialUrl + aEl.attr('href'),
-        source: source 
+        link: partialUrl + aEl.attr('href')
       });
     });
     return items;
   };
  
-  provEm.assembleItems = (ch, partialUrl, source) => {
+  provEm.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('div.news-box h4 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: ch(e).attr('href'),
-        source: source 
+        link: ch(e).attr('href')
       });
     });
     return items;
   };
  
-  provElpais.assembleItems = (ch, partialUrl, source) => {
+  provElpais.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('article.story_card script').each((i,e) => {
@@ -159,8 +150,7 @@ function initialize(){
 
         items.push({ 
           title: obj.headline,
-          link: obj.url,
-          source: source 
+          link: obj.url
         });
       } catch(err) {
         console.log('Error processing El Pais data:', err);
@@ -169,7 +159,7 @@ function initialize(){
     return items;
   };
  
-  provLemonde.assembleItems = (ch, partialUrl, source) => {
+  provLemonde.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('div.card-featured-black').each((i,e) => {
@@ -177,8 +167,7 @@ function initialize(){
       let h = ch(e).find('h2');
       items.push({ 
         title: h.text(),
-        link: aEl.attr('href'),
-        source: source 
+        link: aEl.attr('href')
       });
     });
     
@@ -187,21 +176,19 @@ function initialize(){
       let h = ch(e).find('h4');
       items.push({ 
         title: h.text(),
-        link: aEl.attr('href'),
-        source: source 
+        link: aEl.attr('href')
       });
     });
     return items;
   };
  
-  provCarta.assembleItems = (ch, partialUrl, source) => {
+  provCarta.assembleItems = (ch, partialUrl) => {
     items = [];
 
     ch('#nav-menu-item-45572 * a.eltdf-pt-link').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href'),
-        source: source 
+        link: ch(e).attr('href')
       });
     });
     return items;
@@ -209,16 +196,18 @@ function initialize(){
 
 
   // Add all providers to array
+  providers.push(provEm);
   providers.push(provAfp);
   providers.push(provReuters);
   providers.push(provUol);
   providers.push(provDw);
   providers.push(provG1);
   providers.push(provUn);
-  providers.push(provEm);
   providers.push(provElpais);
   providers.push(provLemonde);
   providers.push(provCarta);
+
+  initialized = true;
 }
 
 module.exports.getProviders = getProviders;

@@ -2,15 +2,38 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 const crypto = require('crypto');
+const iconv = require('iconv-lite');
 
 async function getFile(filename){
   let data = await fs.promises.readFile(path.join(__dirname, filename));
   return data.toString();
 }
 
-async function getFileAbsolute(filename){
-  let data = await fs.promises.readFile(filename);
-  return data.toString();
+async function getFileAbsolute(filename, encoding){
+  return new Promise((resolve, reject) => {
+    let reader = fs.createReadStream(filename);
+    let converterStream = iconv.decodeStream(encoding);
+    reader.pipe(converterStream);
+
+    let data = '';
+    converterStream.on('data', (chunk) => {
+      data += chunk;
+    });
+    converterStream.on('end', () => {
+      resolve(data);
+    });
+    converterStream.on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+function saveFileAbsolute(filename, content, encoding){
+  let data = iconv.encode(content, encoding);
+
+  fs.writeFile(filename, data, err => {
+    if(err) throw err;
+  });
 }
 
 function readLines(file, online, onend){
@@ -41,3 +64,4 @@ module.exports.getFile = getFile;
 module.exports.getFileAbsolute = getFileAbsolute;
 module.exports.readLines = readLines;
 module.exports.getHash = getHash;
+module.exports.saveFileAbsolute = saveFileAbsolute;
