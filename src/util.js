@@ -68,6 +68,13 @@ function shuffle(array){
   }
 }
 
+function flatten(array){
+  return array.reduce((arr, el) => {
+    for(let subEl of el) arr.push(subEl);
+    return arr;
+  })
+}
+
 module.exports.removeDuplicates = removeDuplicates;
 module.exports.getFile = getFile;
 module.exports.getFileAbsolute = getFileAbsolute;
