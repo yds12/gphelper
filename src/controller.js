@@ -19,10 +19,10 @@ async function getItemsListPage(){
   return htmlBuilder.template('index', headlines);
 }
 
-async function removeBadHeadlines(headlines){
+async function removeBadHeadlines(allHeadlines){
   let promises = [];
 
-  for(let headline of headlines){
+  for(let headline of allHeadlines){
     let prom = dal.getHeadline(headline.id);
     promises.push(prom);
     prom.then((hlDb) => {
@@ -31,7 +31,7 @@ async function removeBadHeadlines(headlines){
   }
 
   return Promise.all(promises).then((values) => {
-    let filtered = headlines.filter(el => !el.remove);
+    let filtered = allHeadlines.filter(el => !el.remove);
     return filtered;
   });
 }
