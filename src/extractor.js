@@ -23,12 +23,12 @@ async function extract(){
       source = provider.cutHtml(source);
       let ch = cheerio.load(source);
       let parsedUrl = url_module.parse(provider.url);
-      let partialUrl = parsedUrl.protocol + '//' + parsedUrl.host;
+      let baseUrl = parsedUrl.protocol + '//' + parsedUrl.host;
 
       let website = parsedUrl.hostname.toLowerCase()
         .replace(/(^www\.|\.com\.br$|\.com$|\.org$|\.org\.br$)/g, '');
 
-      elements = elements.concat(provider.getItems(ch, partialUrl, website));
+      elements = elements.concat(provider.getItems(ch, baseUrl, website));
     } catch(err){
       console.log('Error while fetching data from provider:', err.message);
       throw err;
