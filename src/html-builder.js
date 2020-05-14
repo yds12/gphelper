@@ -8,7 +8,7 @@ async function buildTemplate(template, data){
 
     let list = '<ul id="items">';
     for(let item of data){
-      list += `<li data-id="${item.id}">`;
+      list += `<li data-id="${item.id}" data-exists="${item.exists}">`;
       list += '<input type="checkbox" class="good" title="Good"/>';
       list += '<input type="checkbox" class="bad" title="Bad"/>';
       list += `<span class="source">${item.source}</span>`;

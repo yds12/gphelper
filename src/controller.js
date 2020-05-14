@@ -26,7 +26,11 @@ async function removeBadHeadlines(allHeadlines){
     let prom = dal.getHeadline(headline.id);
     promises.push(prom);
     prom.then((hlDb) => {
-      if(hlDb && !hlDb.value.good) headline.remove = true;
+      if(hlDb) {
+        if(!hlDb.value.good) headline.remove = true;
+        else headline.exists = true;
+      }
+      else headline.exists = false;
     });
   }
 

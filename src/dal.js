@@ -20,9 +20,9 @@ function setup(config){
 }
 
 function testConnection(){
-  db.get(dbName, '_all_docs').then((data, headers, status) =>
-    console.log(`Query from ${dbName}:`, data), err =>
-    console.log(`Failed to query ${dbName}:`, err.message));
+  db.get(dbName, '_all_docs').then(({data, headers, status}) =>
+    console.log(`Query to ${dbName}: ${data.total_rows} rows returned.`), 
+    err => console.log(`Failed to query ${dbName}:`, err.message));
 }
 
 function getHeadline(id){
