@@ -20,7 +20,9 @@ async function extract(){
         .replace(/(^www\.|\.com\.br$|\.com$|\.org$|\.org\.br$)/g, '');
 
       let elementsOfThisProvider = provider.getItems(ch, baseUrl, website);
-      elements.push(elementsOfThisProvider);
+
+      if(elementsOfThisProvider.length > 0)
+        elements.push(elementsOfThisProvider);
     } catch(err){
       console.log('Error while fetching data from provider:', err.message);
       throw err;
@@ -37,7 +39,9 @@ function sortElements(elements){
 
   while(elements.length > 0){
     let provIdx = Math.floor(Math.random() * elements.length);
+    let elementsProv = elements[provIdx].toString();
     let headline = elements[provIdx].splice(0, 1)[0];
+
     sortedHeadlines.push(headline);
 
     if(elements[provIdx].length === 0) elements.splice(provIdx, 1);
