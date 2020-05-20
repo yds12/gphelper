@@ -11,18 +11,18 @@ class Provider {
     return htmlBody;
   }
 
-  getItems(ch, partialUrl, source){
-    const items = this.assembleItems(ch, partialUrl);
+  getItems(ch, baseUrl, source){
+    const items = this.assembleItems(ch, baseUrl);
     this.generateItemsSource(items, source);
     this.generateItemsId(items);
     return items;
   }
 
-  assembleItems(ch, partialUrl){
+  assembleItems(ch, baseUrl){
     let items = [];
 
     for(let pipeline of this.itemsPipeline)
-      this.processPipeline(pipeline, items, ch, partialUrl);
+      this.processPipeline(pipeline, items, ch, baseUrl);
 
     return items;
   }
@@ -31,7 +31,7 @@ class Provider {
     this.itemsPipeline.push(pl);
   }
 
-  processPipeline(pl, items, ch, partialUrl){
+  processPipeline(pl, items, ch, baseUrl){
     let mainElement = ch(pl.mainFilter);
     if(pl.useChildren) mainElement = mainElement.children();
 
@@ -52,7 +52,7 @@ class Provider {
 
       if(!href.toLowerCase().startsWith('http') &&
          !href.toLowerCase().startsWith('www')){
-        href = partialUrl + href;
+        href = baseUrl + href;
       }
 
       let newItem = {

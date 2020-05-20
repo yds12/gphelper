@@ -2,7 +2,7 @@ body {
   font-family: 'Didact Gothic', sans;
   font-size: 18px;
   color: #222222;
-  background: #fafafa;
+  background: #eeeeee;
 }
 
 ul {
@@ -28,4 +28,8 @@ span.source {
   margin-right: 10px;
   font-size: 15px;
   font-variant: all-small-caps;
+}
+
+li[data-exists="true"] a {
+  color: #9999ff;
 }

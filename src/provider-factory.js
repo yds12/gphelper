@@ -36,8 +36,7 @@ function initialize(){
   };
 
 
-  // Set providers' assembleItems method or just add parts to the processing
-  // pipeline
+  // Add parts to the items processing pipeline
   provAfp.addItemsPipeline({
     mainFilter: 'h3 a'
   });
@@ -89,33 +88,36 @@ function initialize(){
     mainFilter: '#nav-menu-item-45572 a.eltdf-pt-link'
   });
 
-  provReuters.assembleItems = (ch, partialUrl) => {
+
+  // Set assembleItems for providers that don't fit the items pipeline
+  // standard
+  provReuters.assembleItems = (ch, baseUrl) => {
     let items = [];
 
     ch('h4 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href')
+        link: baseUrl + ch(e).attr('href')
       });
     });
     ch('h5 a').each((i,e) => {
       items.push({ 
         title: ch(e).text(),
-        link: partialUrl + ch(e).attr('href')
+        link: baseUrl + ch(e).attr('href')
       });
     });
     ch('div.headlineMed a').each((i,e) => {
       if(ch(e).siblings().length > 0){
         items.push({ 
           title: ch(e).text(),
-          link: partialUrl + ch(e).attr('href')
+          link: baseUrl + ch(e).attr('href')
         });
       }
     });
     return items;
   };
  
-  provElpais.assembleItems = (ch, partialUrl) => {
+  provElpais.assembleItems = (ch, baseUrl) => {
     let items = [];
 
     ch('article.story_card script').each((i,e) => {

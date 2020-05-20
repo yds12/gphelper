@@ -50,6 +50,9 @@ function submitForm(e){
     console.log(res);
     console.log('Request finalized.');
     console.log('Status:', res.target.status);
+    const responseObj = JSON.parse(res.target.response);
+    console.log('Response:', res.target.response);
+    window.location = responseObj.redirect;
   }
 }
 

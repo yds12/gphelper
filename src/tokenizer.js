@@ -1,6 +1,7 @@
 const stemmer = require('./stemmer');
 const util = require('./util');
 
+const minWordSize = 2;
 let blacklist = [];
 
 function initialize(config){
@@ -41,6 +42,7 @@ function getTokens(text){
     if(!word) continue;
 
     word = removePunctuation(word);
+    if(word.length < minWordSize) continue;
 
     if(isNumber(word)){
       tokens.push('_NUM_');

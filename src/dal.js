@@ -20,19 +20,19 @@ function setup(config){
 }
 
 function testConnection(){
-  db.get(dbName, '_all_docs').then((data, headers, status) =>
-    console.log(`Query from ${dbName}:`, data), err =>
-    console.log(`Failed to query ${dbName}:`, err.message));
+  db.get(dbName, '_all_docs').then(({data, headers, status}) =>
+    console.log(`Query to ${dbName}: ${data.total_rows} rows returned.`), 
+    err => console.log(`Failed to query ${dbName}:`, err.message));
 }
 
-function headlineExists(id){
+function getHeadline(id){
   const queryOptions = { key: id };
 
   return db.get(dbName, headlinesView, queryOptions)
     .then(({ data, headers, status }) => {
       if(data){
-        if(data.rows.length > 0 && data.rows[0].id) return true;
-        else return false;
+        if(data.rows.length > 0 && data.rows[0].id) return data.rows[0];
+        else return null;
       }
       else throw Error(`Headline query failed for ID=${id}!`);
     }, err => console.log('Query failed:', err));
@@ -120,5 +120,5 @@ async function addToken(token){
 module.exports.setup = setup;
 module.exports.testConnection = testConnection;
 module.exports.addToken = addToken;
-module.exports.headlineExists = headlineExists;
+module.exports.getHeadline = getHeadline;
 module.exports.insertHeadline = insertHeadline;

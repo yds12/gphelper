@@ -15,7 +15,29 @@ function setup(config, callback){
 
 async function getItemsListPage(){
   headlines = await extractor.extract();
+  headlines = await removeBadHeadlines(headlines);
   return htmlBuilder.template('index', headlines);
+}
+
+async function removeBadHeadlines(allHeadlines){
+  let promises = [];
+
+  for(let headline of allHeadlines){
+    let prom = dal.getHeadline(headline.id);
+    promises.push(prom);
+    prom.then((hlDb) => {
+      if(hlDb) {
+        if(!hlDb.value.good) headline.remove = true;
+        else headline.exists = true;
+      }
+      else headline.exists = false;
+    });
+  }
+
+  return Promise.all(promises).then((values) => {
+    let filtered = allHeadlines.filter(el => !el.remove);
+    return filtered;
+  });
 }
 
 function getClientConfigFile(){
@@ -64,7 +86,8 @@ async function addExamples(goodIds, badIds){
     let item = allItems[i];
     let good = i < goodItems.length;
     let tokens = tokenizer.getTokens(item.title);
-    let headlineExists = await dal.headlineExists(item.id);
+    let headlineFromDb = await dal.getHeadline(item.id);
+    let headlineExists = (headlineFromDb != null);
 
     if(headlineExists) {
       console.log(`Headline ID=${item.id} already exists.`);

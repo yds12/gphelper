@@ -59,9 +59,26 @@ function removeDuplicates(arr){
   return arr.filter((v, i, self) => self.indexOf(v) === i);
 }
 
+function shuffle(array){
+  for(let i = array.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+function flatten(array){
+  return array.reduce((arr, el) => {
+    for(let subEl of el) arr.push(subEl);
+    return arr;
+  })
+}
+
 module.exports.removeDuplicates = removeDuplicates;
 module.exports.getFile = getFile;
 module.exports.getFileAbsolute = getFileAbsolute;
 module.exports.readLines = readLines;
 module.exports.getHash = getHash;
 module.exports.saveFileAbsolute = saveFileAbsolute;
+module.exports.shuffle = shuffle;

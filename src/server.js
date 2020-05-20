@@ -51,7 +51,7 @@ function setupRoutes(){
   app.post('/', (req, res) => {
     if(req.body.bad && req.body.good){
       controller.addExamples(req.body.good, req.body.bad);
-      res.send();
+      res.json({ redirect: '/' })
     }
     else console.log('Content received via POST is invalid.');
   });
